@@ -4,21 +4,22 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"path/filepath"
 	"time"
 
 	"dependencyvisualizer/src/config"
 	"dependencyvisualizer/src/graph"
 	"dependencyvisualizer/src/maven"
-	"dependencyvisualizer/src/testrepo"
 )
 
-// analyze строит и выводит граф, ограничивая общее время анализа.
-func analyze(cfg config.Config, configPath string, out io.Writer) error {
+// analyze запускает выбранную операцию, ограничивая общее время анализа.
+func analyze(cfg config.Config, options options, out io.Writer) error {
 	const analysisTimeout = 60 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), analysisTimeout)
 	defer cancel()
-	source, err := dependencySource(cfg, configPath)
+	if options.Reverse != "" {
+		return analyzeReverse(ctx, cfg, options, out)
+	}
+	source, err := dependencySource(cfg, options.ConfigPath)
 	if err != nil {
 		return err
 	}
@@ -35,11 +36,7 @@ func analyze(cfg config.Config, configPath string, out io.Writer) error {
 // dependencySource выбирает источник; относительный путь считается от INI, а не от cwd.
 func dependencySource(cfg config.Config, configPath string) (graph.Source, error) {
 	if cfg.TestMode {
-		path := cfg.Repository
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(filepath.Dir(configPath), path)
-		}
-		repository, err := testrepo.Load(path)
+		repository, err := loadTestRepository(cfg, configPath)
 		if err != nil {
 			return nil, err
 		}
