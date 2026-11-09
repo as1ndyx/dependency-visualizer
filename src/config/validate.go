@@ -6,14 +6,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"dependencyvisualizer/src/maven"
 )
 
 // Форматы имён: координаты Maven и тестовые пакеты из заглавных латинских букв.
-var (
-	mavenName = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.-]*:` +
-		`[A-Za-z0-9_][A-Za-z0-9_.-]*:[A-Za-z0-9_][A-Za-z0-9_.+-]*$`)
-	testName = regexp.MustCompile(`^[A-Z]+$`)
-)
+var testName = regexp.MustCompile(`^[A-Z]+$`)
 
 // validate проверяет имя пакета и источник репозитория с учётом режима.
 // Filter может быть любой печатной строкой, включая пустую.
@@ -24,7 +22,7 @@ func (c Config) validate(configPath string) error {
 		}
 		return validateFile(c.Repository, configPath)
 	}
-	if !mavenName.MatchString(c.Package) {
+	if _, err := maven.ParseCoordinates(c.Package); err != nil {
 		return fmt.Errorf("package: ожидаются координаты Maven groupId:artifactId:version")
 	}
 	return validateURL(c.Repository)

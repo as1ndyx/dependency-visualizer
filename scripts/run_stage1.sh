@@ -1,13 +1,11 @@
 #!/bin/sh
-# Этап 1: успешные запуски и обработка ошибок всех параметров.
+# Этап 1: регрессионная проверка INI и ошибок всех параметров после добавления этапа 2.
 set -eu
 cd "$(dirname "$0")/.."
 go build -o bin/depgraph ./src
 
-echo "--- обычный режим Maven ---"
-./bin/depgraph -config config.ini
-echo "--- тестовый режим и пустой фильтр ---"
-./bin/depgraph -config examples/test.ini
+echo "--- чтение INI в обычном и тестовом режимах ---"
+go test ./tests -run '^TestLoad' -v
 
 # expect_error проверяет сообщение и код возврата настоящего CLI.
 expect_error() {
@@ -16,8 +14,7 @@ expect_error() {
     echo "--- $label ---"
     status=0
     output=$(./bin/depgraph "$@" 2>&1) || status=$?
-    printf '%s
-' "$output"
+    printf '%s\n' "$output"
     if [ "$status" -ne 1 ]; then
         echo "ожидался код возврата 1, получен $status" >&2
         exit 1

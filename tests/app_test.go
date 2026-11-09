@@ -9,19 +9,18 @@ import (
 	"dependencyvisualizer/src/app"
 )
 
-func TestRunPrintsAllParameters(t *testing.T) {
-	path := writeConfig(t, validINI)
+func TestRunPrintsDirectDependencies(t *testing.T) {
+	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "2", "")+"</dependencies>")
 	var out, errOut strings.Builder
 	code := app.Run([]string{"-config", path}, &out, &errOut)
-	want := "package = org.apache.commons:commons-lang3:3.12.0\n" +
-		"repository = https://repo.maven.apache.org/maven2\ntest_mode = false\nfilter = junit\n"
+	want := "Прямые зависимости org.example:app:1:\norg.example:lib:2 [scope=compile]\n"
 	if code != app.ExitOK || out.String() != want || errOut.Len() != 0 {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
 }
 
 func TestRunDefaultConfig(t *testing.T) {
-	path := writeConfig(t, validINI)
+	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "2", "")+"</dependencies>")
 	t.Chdir(filepath.Dir(path))
 	var out, errOut strings.Builder
 	if code := app.Run(nil, &out, &errOut); code != app.ExitOK || out.Len() == 0 {
@@ -64,8 +63,25 @@ func (brokenWriter) Write(p []byte) (int, error) {
 
 func TestRunOutputError(t *testing.T) {
 	var errOut strings.Builder
-	code := app.Run([]string{"-config", writeConfig(t, validINI)}, brokenWriter{}, &errOut)
+	code := app.Run([]string{"-config", writeMavenConfig(t, "")}, brokenWriter{}, &errOut)
 	if code != app.ExitError || !strings.Contains(errOut.String(), "ошибка вывода") {
 		t.Fatalf("код %d, stderr %q", code, errOut.String())
+	}
+}
+
+func TestRunTestModeNotImplemented(t *testing.T) {
+	var out, errOut strings.Builder
+	code := app.Run([]string{"-config", "../examples/test.ini"}, &out, &errOut)
+	if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "этапе 3") {
+		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
+	}
+}
+
+func TestRunMavenError(t *testing.T) {
+	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "", "")+"</dependencies>")
+	var out, errOut strings.Builder
+	code := app.Run([]string{"-config", path}, &out, &errOut)
+	if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "версию") {
+		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
 }

@@ -1,4 +1,4 @@
-.PHONY: run build test fmt vet demo clean
+.PHONY: run build test fmt vet demo demo-config clean
 
 run:
 	go run ./src
@@ -16,6 +16,9 @@ vet:
 	go vet ./...
 
 demo:
+	./scripts/run_stage2.sh
+
+demo-config:
 	./scripts/run_stage1.sh
 
 clean:
