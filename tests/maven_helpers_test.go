@@ -62,7 +62,8 @@ func mavenPath(artifact string) string {
 // writeMavenConfig создаёт INI с локальным HTTP-репозиторием.
 func writeMavenConfig(t *testing.T, body string) string {
 	t.Helper()
-	server, _ := mavenServer(t, map[string]string{mavenPath("app"): pomXML(body)})
+	server, _ := mavenServer(t, map[string]string{mavenPath("app"): pomXML(body),
+		"/org/example/lib/2/lib-2.pom": pomXML("")})
 	text := strings.Replace(validINI, "org.apache.commons:commons-lang3:3.12.0", "org.example:app:1", 1)
 	text = strings.Replace(text, "https://repo.maven.apache.org/maven2", server.URL, 1)
 	return writeConfig(t, text)

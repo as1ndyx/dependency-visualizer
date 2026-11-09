@@ -9,11 +9,12 @@ import (
 	"dependencyvisualizer/src/app"
 )
 
-func TestRunPrintsDirectDependencies(t *testing.T) {
+func TestRunPrintsDependencyGraph(t *testing.T) {
 	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "2", "")+"</dependencies>")
 	var out, errOut strings.Builder
 	code := app.Run([]string{"-config", path}, &out, &errOut)
-	want := "Прямые зависимости org.example:app:1:\norg.example:lib:2 [scope=compile]\n"
+	want := "Граф зависимостей org.example:app:1 (DFS):\n" +
+		"org.example:app:1 -> org.example:lib:2\norg.example:lib:2 -> (нет зависимостей)\nЦиклы: нет\n"
 	if code != app.ExitOK || out.String() != want || errOut.Len() != 0 {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
@@ -69,10 +70,10 @@ func TestRunOutputError(t *testing.T) {
 	}
 }
 
-func TestRunTestModeNotImplemented(t *testing.T) {
+func TestRunTestMode(t *testing.T) {
 	var out, errOut strings.Builder
 	code := app.Run([]string{"-config", "../examples/test.ini"}, &out, &errOut)
-	if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "этапе 3") {
+	if code != app.ExitOK || !strings.Contains(out.String(), "A -> B, C") || errOut.Len() != 0 {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
 }

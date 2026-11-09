@@ -45,7 +45,7 @@ func validateURL(value string) error {
 }
 
 // validateFile проверяет, что тестовый репозиторий является доступным обычным файлом.
-// Чтение описания графа будет добавлено на этапе 3.
+// Содержимое файла затем проверяется парсером пакета testrepo на этапе 3.
 func validateFile(value, configPath string) error {
 	if value == "" {
 		return fmt.Errorf("repository: путь к тестовому репозиторию не должен быть пустым")
