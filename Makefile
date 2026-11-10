@@ -1,4 +1,4 @@
-.PHONY: run build test fmt vet demo demo-graph demo-config demo-maven clean
+.PHONY: run build test fmt vet demo demo-reverse compare demo-graph demo-config demo-maven clean
 
 run:
 	go run ./src
@@ -16,7 +16,13 @@ vet:
 	go vet ./...
 
 demo:
+	./scripts/run_stage5.sh
+
+demo-reverse:
 	./scripts/run_stage4.sh
+
+compare:
+	./scripts/compare_stage5.sh
 
 demo-graph:
 	./scripts/run_stage3.sh

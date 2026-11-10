@@ -6,6 +6,6 @@ cd "$(dirname "$0")/.."
 go build -o bin/depgraph ./src
 
 echo "--- полный граф JUnit ---"
-./bin/depgraph -config config.ini
+./bin/depgraph -format text -config config.ini
 echo "--- исключение hamcrest-library ---"
-./bin/depgraph -config examples/maven-filter.ini
+./bin/depgraph -format text -config examples/maven-filter.ini

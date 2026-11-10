@@ -27,7 +27,11 @@ func analyze(cfg config.Config, options options, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	if err := graph.Print(out, result); err != nil {
+	printGraph := graph.PrintDOT
+	if options.Format == "text" {
+		printGraph = graph.Print
+	}
+	if err := printGraph(out, result); err != nil {
 		return fmt.Errorf("ошибка вывода: %w", err)
 	}
 	return nil

@@ -12,7 +12,7 @@ import (
 func TestRunPrintsDependencyGraph(t *testing.T) {
 	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "2", "")+"</dependencies>")
 	var out, errOut strings.Builder
-	code := app.Run([]string{"-config", path}, &out, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", path}, &out, &errOut)
 	want := "Граф зависимостей org.example:app:1 (DFS):\n" +
 		"org.example:app:1 -> org.example:lib:2\norg.example:lib:2 -> (нет зависимостей)\nЦиклы: нет\n"
 	if code != app.ExitOK || out.String() != want || errOut.Len() != 0 {
@@ -64,7 +64,7 @@ func (brokenWriter) Write(p []byte) (int, error) {
 
 func TestRunOutputError(t *testing.T) {
 	var errOut strings.Builder
-	code := app.Run([]string{"-config", writeMavenConfig(t, "")}, brokenWriter{}, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", writeMavenConfig(t, "")}, brokenWriter{}, &errOut)
 	if code != app.ExitError || !strings.Contains(errOut.String(), "ошибка вывода") {
 		t.Fatalf("код %d, stderr %q", code, errOut.String())
 	}
@@ -72,7 +72,7 @@ func TestRunOutputError(t *testing.T) {
 
 func TestRunTestMode(t *testing.T) {
 	var out, errOut strings.Builder
-	code := app.Run([]string{"-config", "../examples/test.ini"}, &out, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", "../examples/test.ini"}, &out, &errOut)
 	if code != app.ExitOK || !strings.Contains(out.String(), "A -> B, C") || errOut.Len() != 0 {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
@@ -81,7 +81,7 @@ func TestRunTestMode(t *testing.T) {
 func TestRunMavenError(t *testing.T) {
 	path := writeMavenConfig(t, "<dependencies>"+dependencyXML("lib", "", "")+"</dependencies>")
 	var out, errOut strings.Builder
-	code := app.Run([]string{"-config", path}, &out, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", path}, &out, &errOut)
 	if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "версию") {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}

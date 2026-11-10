@@ -7,13 +7,13 @@ go build -o bin/depgraph ./src
 
 for file in examples/stage3/*.ini; do
     echo "--- $file ---"
-    ./bin/depgraph -config "$file"
+    ./bin/depgraph -format text -config "$file"
 done
 
 for file in examples/stage3/errors/*.ini; do
     echo "--- ошибка: $file ---"
     status=0
-    output=$(./bin/depgraph -config "$file" 2>&1) || status=$?
+    output=$(./bin/depgraph -format text -config "$file" 2>&1) || status=$?
     printf '%s\n' "$output"
     if [ "$status" -ne 1 ]; then
         echo "ожидался код возврата 1, получен $status" >&2

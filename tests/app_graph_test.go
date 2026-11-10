@@ -35,7 +35,7 @@ func TestRunTestGraphRelativeAndAbsolutePath(t *testing.T) {
 			}
 		}
 		var out, errOut strings.Builder
-		code := app.Run([]string{"-config", path}, &out, &errOut)
+		code := app.Run([]string{"-format", "text", "-config", path}, &out, &errOut)
 		want := "Граф зависимостей A (DFS):\nA -> B\nB -> A\n" +
 			"Циклы (обратные рёбра DFS):\nB -> A\nИсключены фильтром: C\n"
 		if code != app.ExitOK || out.String() != want || errOut.Len() != 0 {
@@ -48,7 +48,7 @@ func TestRunTestGraphErrors(t *testing.T) {
 	for _, text := range []string{"B:", "A: MISSING", "A B", "A:\nA:"} {
 		path := writeTestGraphConfig(t, text, "A", "")
 		var out, errOut strings.Builder
-		code := app.Run([]string{"-config", path}, &out, &errOut)
+		code := app.Run([]string{"-format", "text", "-config", path}, &out, &errOut)
 		if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "ошибка:") {
 			t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 		}
@@ -75,7 +75,7 @@ func TestRunMavenTransitiveCycle(t *testing.T) {
 	}
 	server, requests := mavenServer(t, files)
 	var out, errOut strings.Builder
-	code := app.Run([]string{"-config", graphMavenConfig(t, server.URL, "")}, &out, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", graphMavenConfig(t, server.URL, "")}, &out, &errOut)
 	want := "Граф зависимостей org.example:app:1 (DFS):\n" +
 		"org.example:app:1 -> org.example:b:1, org.example:c:1\n" +
 		"org.example:b:1 -> org.example:d:1\norg.example:d:1 -> org.example:app:1\n" +
@@ -98,7 +98,7 @@ func TestRunMavenFilterBeforeDownload(t *testing.T) {
 		body := pomXML("<dependencies>" + dependencyXML("skip", "1", "") + "</dependencies>")
 		server, requests := mavenServer(t, map[string]string{mavenPath("app"): body})
 		var out, errOut strings.Builder
-		code := app.Run([]string{"-config", graphMavenConfig(t, server.URL, filter)}, &out, &errOut)
+		code := app.Run([]string{"-format", "text", "-config", graphMavenConfig(t, server.URL, filter)}, &out, &errOut)
 		if code != app.ExitOK || errOut.Len() != 0 || !strings.Contains(out.String(), "Исключены фильтром") {
 			t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 		}
@@ -115,7 +115,7 @@ func TestRunMavenTransitiveError(t *testing.T) {
 	body := pomXML("<dependencies>" + dependencyXML("missing", "1", "") + "</dependencies>")
 	server, _ := mavenServer(t, map[string]string{mavenPath("app"): body})
 	var out, errOut strings.Builder
-	code := app.Run([]string{"-config", graphMavenConfig(t, server.URL, "")}, &out, &errOut)
+	code := app.Run([]string{"-format", "text", "-config", graphMavenConfig(t, server.URL, "")}, &out, &errOut)
 	if code != app.ExitError || out.Len() != 0 || !strings.Contains(errOut.String(), "HTTP 404") ||
 		!strings.Contains(errOut.String(), "зависимости org.example:missing:1") {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
