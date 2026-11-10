@@ -18,8 +18,9 @@ func renderDOT(t *testing.T, value graph.Graph) string {
 	return out.String()
 }
 
+// TestDOTSharedDependencyAndCycle проверяет четыре ребра ромба и замыкающее цикл ребро D -> A.
 func TestDOTSharedDependencyAndCycle(t *testing.T) {
-	const expectedEdgeCount = 5 // Четыре ребра ромба и замыкающее цикл ребро D -> A.
+	const expectedEdgeCount = 5
 	repository := map[string][]string{"A": {"B", "C"}, "B": {"D"}, "C": {"D"}, "D": {"A"}}
 	value := buildTestGraph(t, repository, "A", "")
 	got := renderDOT(t, value)

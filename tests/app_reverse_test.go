@@ -67,8 +67,9 @@ func TestRunReverseFilter(t *testing.T) {
 	}
 }
 
+// TestRunReverseMavenScopeAndNoExtraRequests проверяет запросы только к app и lib при обратном обходе.
 func TestRunReverseMavenScopeAndNoExtraRequests(t *testing.T) {
-	const expectedRequestCount = 2 // Запрашиваются только корень app и его зависимость lib.
+	const expectedRequestCount = 2
 	files := map[string]string{
 		mavenPath("app"):     pomXML("<dependencies>" + dependencyXML("lib", "1", "") + "</dependencies>"),
 		mavenPath("lib"):     pomXML(""),

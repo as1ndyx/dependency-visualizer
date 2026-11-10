@@ -8,8 +8,9 @@ import (
 	"dependencyvisualizer/src/maven"
 )
 
+// TestMavenDependencyInheritance проверяет наследование обычного артефакта и test-jar с classifier tests.
 func TestMavenDependencyInheritance(t *testing.T) {
-	const expectedDependencyCount = 2 // Обычный артефакт и test-jar с classifier tests.
+	const expectedDependencyCount = 2
 	parent := `<dependencies>` + dependencyXML("lib", "2", "<scope>test</scope>") + `</dependencies>`
 	root := parentXML("parent") + `<dependencies>` + dependencyXML("lib", "3", "") +
 		dependencyXML("lib", "4", "<type>test-jar</type><classifier>tests</classifier>") + `</dependencies>`

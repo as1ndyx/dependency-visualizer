@@ -86,8 +86,9 @@ func TestReverseErrors(t *testing.T) {
 	}
 }
 
+// TestReverseOutput проверяет вывод списков прямых и всех обратных зависимостей, включая пустые.
 func TestReverseOutput(t *testing.T) {
-	const expectedEmptyLists = 2 // Отдельные списки прямых и всех обратных зависимостей.
+	const expectedEmptyLists = 2
 	result := graph.ReverseResult{Target: "D", Direct: []string{"B"}, All: []string{"B", "A"}, Excluded: []string{"C"}}
 	var out strings.Builder
 	if err := graph.PrintReverse(&out, result, "весь тестовый репозиторий"); err != nil {

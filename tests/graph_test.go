@@ -87,8 +87,9 @@ func TestGraphFilterPrunesBranch(t *testing.T) {
 	}
 }
 
+// TestGraphRootFilterAndCase проверяет исключение корня и сохранение ROOT и B при несовпадении регистра.
 func TestGraphRootFilterAndCase(t *testing.T) {
-	const expectedNodeCount = 2 // При несовпадении регистра остаются ROOT и B.
+	const expectedNodeCount = 2
 	repository := map[string][]string{"ROOT": {"B"}, "B": {}}
 	got := buildTestGraph(t, repository, "ROOT", "OO")
 	if len(got.Nodes) != 0 || !reflect.DeepEqual(got.Excluded, []string{"ROOT"}) {
