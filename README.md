@@ -427,7 +427,7 @@ make demo-config
 | `src/config/ini.go` | `parseINI`, `parseLine`, `storeValue` — чтение INI. |
 | `src/config/validate.go` | `validate`, `validateURL`, `validateFile` — проверка настроек. |
 | `src/maven/model.go` | `Coordinates`, `Dependency`, `ParseCoordinates`, `String`, `key`, `inherit` — модель Maven. |
-| `src/maven/client.go` | `NewClient`, `POMURL`, `download`, `fetch` — HTTP-загрузка и общий кэш. |
+| `src/maven/client.go` | `NewClient`, `POMURL`, `parseRepositoryURL`, `download`, `fetch` — проверка URL, HTTP-загрузка и общий кэш. |
 | `src/maven/pom.go` | `decodePOM`, `checkXMLTail`, `charsetReader` — чтение XML. |
 | `src/maven/properties.go` | `properties`, `expand`, `expandDependency` — подстановка свойств. |
 | `src/maven/resolver.go` | `DirectDependencies`, `load`, `parentChain`, `collectDependencies`, `completeDependency` — сборщик прямых зависимостей. |

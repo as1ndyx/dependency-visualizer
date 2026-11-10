@@ -9,6 +9,7 @@ import (
 )
 
 func TestMavenDependencyInheritance(t *testing.T) {
+	const expectedDependencyCount = 2 // Обычный артефакт и test-jar с classifier tests.
 	parent := `<dependencies>` + dependencyXML("lib", "2", "<scope>test</scope>") + `</dependencies>`
 	root := parentXML("parent") + `<dependencies>` + dependencyXML("lib", "3", "") +
 		dependencyXML("lib", "4", "<type>test-jar</type><classifier>tests</classifier>") + `</dependencies>`
@@ -17,7 +18,8 @@ func TestMavenDependencyInheritance(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(got) != 2 || got[0].Version != "3" || got[0].Scope != "test" || got[1].Classifier != "tests" {
+	if len(got) != expectedDependencyCount ||
+		got[0].Version != "3" || got[0].Scope != "test" || got[1].Classifier != "tests" {
 		t.Fatalf("неверное наследование или потерян classifier: %+v", got)
 	}
 }

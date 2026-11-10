@@ -87,6 +87,7 @@ func TestReverseErrors(t *testing.T) {
 }
 
 func TestReverseOutput(t *testing.T) {
+	const expectedEmptyLists = 2 // Отдельные списки прямых и всех обратных зависимостей.
 	result := graph.ReverseResult{Target: "D", Direct: []string{"B"}, All: []string{"B", "A"}, Excluded: []string{"C"}}
 	var out strings.Builder
 	if err := graph.PrintReverse(&out, result, "весь тестовый репозиторий"); err != nil {
@@ -101,7 +102,7 @@ func TestReverseOutput(t *testing.T) {
 	if err := graph.PrintReverse(&out, graph.ReverseResult{Target: "A"}, "граф A"); err != nil {
 		t.Fatal(err)
 	}
-	if strings.Count(out.String(), "(нет)") != 2 {
+	if strings.Count(out.String(), "(нет)") != expectedEmptyLists {
 		t.Fatal(out.String())
 	}
 	if err := graph.PrintReverse(brokenWriter{}, result, "граф A"); err == nil {

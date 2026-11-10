@@ -45,16 +45,25 @@ func POMURL(repository string, coordinates Coordinates) (string, error) {
 	if strings.HasSuffix(coordinates.Version, "-SNAPSHOT") {
 		return "", fmt.Errorf("SNAPSHOT-версии с maven-metadata.xml пока не поддерживаются")
 	}
-	u, err := url.Parse(repository)
-	if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") {
-		return "", fmt.Errorf("repository: ожидается абсолютный URL HTTP(S)")
-	}
-	if u.User != nil || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" {
-		return "", fmt.Errorf("repository: URL содержит неподдерживаемые компоненты")
+	u, err := parseRepositoryURL(repository)
+	if err != nil {
+		return "", err
 	}
 	path := strings.ReplaceAll(coordinates.GroupID, ".", "/") + "/" + coordinates.ArtifactID
 	path += "/" + coordinates.Version + "/" + coordinates.ArtifactID + "-" + coordinates.Version + ".pom"
 	return strings.TrimRight(u.String(), "/") + "/" + path, nil
+}
+
+// parseRepositoryURL проверяет адрес репозитория перед добавлением пути к POM.
+func parseRepositoryURL(repository string) (*url.URL, error) {
+	u, err := url.Parse(repository)
+	if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") {
+		return nil, fmt.Errorf("repository: ожидается абсолютный URL HTTP(S)")
+	}
+	if u.User != nil || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" {
+		return nil, fmt.Errorf("repository: URL содержит неподдерживаемые компоненты")
+	}
+	return u, nil
 }
 
 // download загружает ограниченный по размеру POM и проверяет статус HTTP.

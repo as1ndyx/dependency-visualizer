@@ -68,6 +68,7 @@ func TestRunReverseFilter(t *testing.T) {
 }
 
 func TestRunReverseMavenScopeAndNoExtraRequests(t *testing.T) {
+	const expectedRequestCount = 2 // Запрашиваются только корень app и его зависимость lib.
 	files := map[string]string{
 		mavenPath("app"):     pomXML("<dependencies>" + dependencyXML("lib", "1", "") + "</dependencies>"),
 		mavenPath("lib"):     pomXML(""),
@@ -82,7 +83,8 @@ func TestRunReverseMavenScopeAndNoExtraRequests(t *testing.T) {
 	if code != app.ExitOK || out.String() != want || errOut.Len() != 0 {
 		t.Fatalf("код %d, stdout %q, stderr %q", code, out.String(), errOut.String())
 	}
-	if len(requests()) != 2 || requests()[mavenPath("app")] != 1 || requests()[mavenPath("lib")] != 1 {
+	if len(requests()) != expectedRequestCount ||
+		requests()[mavenPath("app")] != 1 || requests()[mavenPath("lib")] != 1 {
 		t.Fatalf("лишние запросы при обратном обходе: %v", requests())
 	}
 }

@@ -88,13 +88,14 @@ func TestGraphFilterPrunesBranch(t *testing.T) {
 }
 
 func TestGraphRootFilterAndCase(t *testing.T) {
+	const expectedNodeCount = 2 // При несовпадении регистра остаются ROOT и B.
 	repository := map[string][]string{"ROOT": {"B"}, "B": {}}
 	got := buildTestGraph(t, repository, "ROOT", "OO")
 	if len(got.Nodes) != 0 || !reflect.DeepEqual(got.Excluded, []string{"ROOT"}) {
 		t.Fatalf("корень не исключён: %+v", got)
 	}
 	got = buildTestGraph(t, repository, "ROOT", "oo")
-	if len(got.Nodes) != 2 {
+	if len(got.Nodes) != expectedNodeCount {
 		t.Fatalf("поиск подстроки должен учитывать регистр: %+v", got)
 	}
 }

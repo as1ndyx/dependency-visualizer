@@ -19,6 +19,7 @@ func renderDOT(t *testing.T, value graph.Graph) string {
 }
 
 func TestDOTSharedDependencyAndCycle(t *testing.T) {
+	const expectedEdgeCount = 5 // Четыре ребра ромба и замыкающее цикл ребро D -> A.
 	repository := map[string][]string{"A": {"B", "C"}, "B": {"D"}, "C": {"D"}, "D": {"A"}}
 	value := buildTestGraph(t, repository, "A", "")
 	got := renderDOT(t, value)
@@ -30,7 +31,7 @@ func TestDOTSharedDependencyAndCycle(t *testing.T) {
 	if !strings.Contains(got, `"D" -> "A" [color="#dc2626", penwidth=2];`) {
 		t.Fatal("ребро цикла не выделено")
 	}
-	if strings.Count(got, `color="#dc2626"`) != 1 || strings.Count(got, " -> ") != 5 {
+	if strings.Count(got, `color="#dc2626"`) != 1 || strings.Count(got, " -> ") != expectedEdgeCount {
 		t.Fatal("ложный цикл или лишние рёбра")
 	}
 	if renderDOT(t, value) != got {
